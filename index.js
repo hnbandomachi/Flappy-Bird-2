@@ -6,6 +6,8 @@ const w = 288, h = 512, hole = 80;
 
 function setup() {
     createCanvas(w, h);
+    textSize(20);
+
     bgImage = loadImage('/image/bgNight.png');
     birdImage = loadImage('/image/birdMid.png');
     baseImage = loadImage('image/base.png');
@@ -17,21 +19,14 @@ function setup() {
 };
 
 function draw() {
-    bg.show();    
-
-    if (frameCount < 300) {
-        if (frameCount%100 == 0) {
-            pipes.push(new Pipe());
-        };                
+    bg.show();
+    if (frameCount % 100 == 0) {
+        pipes.push(new Pipe());
     };
 
     for (let i = 0; i < pipes.length; i++) {
         if (pipes[i].overBackground()) {
             pipes.splice(0, 1);
-            if (frameCount > 300) {
-                pipes.push(new Pipe());
-            };
-
         };
         pipes[i].show();
     };
@@ -49,66 +44,76 @@ function Bird() {
     this.v = 0;
     this.a = 0.4;
 
-    this.flap = function() {
+    this.flap = function () {
         if (keyIsPressed === true) {
             this.v = -6;
             keyIsPressed = false;
         };
     };
 
-    this.overcome = function() {
-        if (pipes[0].xup <= this.x - pipes[0].width - this.width/2 && check) {
+    this.overcome = function () {
+        if (this.x > pipes[0].x + pipes[0].width && check) {
             check = false;
             return true;
         };
     };
 
-    this.update = function() {
+    this.update = function () {
         this.flap();
         this.v += this.a;
         this.y += this.v;
 
         if (this.overcome()) {
-            score++;
+            score++; 
+            console.log('score: ', score);
         };
     };
 
-    this.dead = function() {
-        
-    };    
+    this.dead = function () {
+        if (this.y < 0 || this.y > h - 97) {
+            return true;
+        };
 
-    this.show = function() {        
+        if (this.x > pipes[0].x - this.width && this.x < pipes[0].x + pipes[0].width) {
+            if (this.y < pipes[0].hup|| this.y > pipes[0].hup + hole - this.height) {
+                return true;
+            }
+        };
+    };
+
+    this.show = function () {
         this.update();
+        text('score: '+ score, 15, 25);
         image(birdImage, this.x, this.y);
-    };    
+    };
 };
 
 function Pipe() {
     this.width = 52;
-    this.height = 320;    
+    this.height = 320;
     this.x = w;
-    this.yup = floor(random(-0.55*this.height, -0.35*this.height));
+    this.yup = floor(random(-0.55 * this.height, -0.35 * this.height));
     this.hup = this.height + this.yup;
     this.ydow = this.hup + hole;
 
     this.pipeUp = loadImage('/image/pipe-green-2.png');
     this.pipeDow = loadImage('/image/pipe-green.png');
 
-    this.update = function() {
-        this.x -= speed;        
+    this.update = function () {
+        this.x -= speed;
     };
 
-    this.show = function() {
+    this.show = function () {
         this.update();
         image(this.pipeDow, this.x, this.ydow);
         image(this.pipeUp, this.x, this.yup);
     };
 
-    this.overBackground = function() {
+    this.overBackground = function () {
         if (this.x < -this.width) {
             check = true;
             return true;
-        } ;
+        };
     };
 };
 
@@ -117,14 +122,14 @@ function Base() {
     this.height = 112;
     this.x = 0;
 
-    this.update = function() {
+    this.update = function () {
         if (this.x < -this.width) {
             this.x = 0;
         }
         this.x -= speed;
     };
 
-    this.show = function() {
+    this.show = function () {
         this.update();
         image(baseImage, this.x, h - 70);
         image(baseImage, this.width + this.x, h - 70);
@@ -136,15 +141,14 @@ function Background() {
     this.width = 288;
     this.height = 512;
 
-    this.update = function() {
+    this.update = function () {
         if (this.x < -this.width) {
             this.x = 0;
-            console.log('bg');
         }
         this.x -= 0.2;
     };
 
-    this.show = function() {
+    this.show = function () {
         this.update();
         image(bgImage, this.x, 0);
         image(bgImage, this.width + this.x, 0);
@@ -154,3 +158,4 @@ function Background() {
 function gameover() {
     frameRate(0);
 };
+
