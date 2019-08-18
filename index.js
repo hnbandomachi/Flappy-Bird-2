@@ -2,14 +2,21 @@
 
 var bird, bg, score = 0, speed = 2;
 var pipes = [], check = true;
-const w = 288, h = 512, hole = 80;
+const w = 288, h = 512, hole = 70;
+var game = true;
+var birdImages = [];
 
 function setup() {
     createCanvas(w, h);
     textSize(20);
+    frameRate(50);
 
     bgImage = loadImage('/image/bgNight.png');
-    birdImage = loadImage('/image/birdMid.png');
+    birdUp = loadImage('/image/birdUp.png');
+    birdMid = loadImage('/image/birdMid.png');
+    birdDown = loadImage('/image/birdDown.png');
+    birdImages = [birdUp, birdMid, birdDown];
+
     baseImage = loadImage('image/base.png');
 
     bg = new Background();
@@ -19,21 +26,31 @@ function setup() {
 };
 
 function draw() {
-    bg.show();
-    if (frameCount % 100 == 0) {
-        pipes.push(new Pipe());
-    };
-
-    for (let i = 0; i < pipes.length; i++) {
-        if (pipes[i].overBackground()) {
-            pipes.splice(0, 1);
+    if (game) {
+        bg.show();
+        if (frameCount % 100 == 0) {
+            pipes.push(new Pipe());
         };
-        pipes[i].show();
-    };
-    base.show();
 
-    bird.show();    
-    if (bird.dead()) gameover();
+        for (let i = 0; i < pipes.length; i++) {
+            if (pipes[i].overBackground()) {
+                pipes.splice(0, 1);
+            };
+            pipes[i].show();
+        };
+        base.show();
+
+        bird.show();
+        if (bird.dead()) gameover();
+    }
+
+    else {
+        if (keyIsPressed === true) {
+            keyIsPressed = false;
+            game = true;
+            frameCount = 0;
+        };
+    };
 };
 
 function Bird() {
@@ -46,8 +63,8 @@ function Bird() {
 
     this.flap = function () {
         if (keyIsPressed === true) {
-            this.v = -6;
             keyIsPressed = false;
+            this.v = -6;
         };
     };
 
@@ -64,7 +81,7 @@ function Bird() {
         this.y += this.v;
 
         if (this.overcome()) {
-            score++; 
+            score++;
             console.log('score: ', score);
         };
     };
@@ -74,8 +91,8 @@ function Bird() {
             return true;
         };
 
-        if (this.x > pipes[0].x - this.width && this.x < pipes[0].x + pipes[0].width) {
-            if (this.y < pipes[0].hup|| this.y > pipes[0].hup + hole - this.height) {
+        if (this.x > pipes[0].x - this.width + 5 && this.x < pipes[0].x + pipes[0].width - 5) {
+            if (this.y < pipes[0].hup || this.y > pipes[0].hup + hole - this.height) {
                 return true;
             }
         };
@@ -83,8 +100,8 @@ function Bird() {
 
     this.show = function () {
         this.update();
-        text('score: '+ score, 15, 25);
-        image(birdImage, this.x, this.y);
+        text('score: ' + score, 15, 25);
+        image(birdImages[floor(frameCount/10)%3], this.x, this.y);        
     };
 };
 
@@ -156,6 +173,11 @@ function Background() {
 };
 
 function gameover() {
-    frameRate(0);
+    // frameRate(0);
+    score = 0;
+    pipes = [];
+    bird.x = 70; bird.y = 70; bird.v = 0;
+    pipes.push(new Pipe);
+    game = false;
 };
 
