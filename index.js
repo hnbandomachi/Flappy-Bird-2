@@ -45,8 +45,10 @@ function draw() {
     }
 
     else {
-        if (keyIsPressed === true) {
-            keyIsPressed = false;
+        fill(0,123,255);
+        text("Press 'q' to play again...", 40, 500);
+        if (key == 'q') {
+            // keyIsPressed = false;
             game = true;
             frameCount = 0;
         };
@@ -57,7 +59,7 @@ function Bird() {
     this.width = 34;
     this.height = 24;
     this.x = 70;
-    this.y = 70;
+    this.y = 90;
     this.v = 0;
     this.a = 0.4;
 
@@ -100,7 +102,8 @@ function Bird() {
 
     this.show = function () {
         this.update();
-        text('score: ' + score, 15, 25);
+        fill(255,255,0);
+        text('Score: ' + score, 15, 25);
         image(birdImages[floor(frameCount/10)%3], this.x, this.y);        
     };
 };
@@ -176,7 +179,7 @@ function gameover() {
     // frameRate(0);
     score = 0;
     pipes = [];
-    bird.x = 70; bird.y = 70; bird.v = 0;
+    bird.x = 70; bird.y = 90; bird.v = 0;
     pipes.push(new Pipe);
     game = false;
 };
